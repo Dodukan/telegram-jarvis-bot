@@ -1,10 +1,12 @@
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 import os
-import requests
+from google import genai
 
 TOKEN = os.getenv("TOKEN")
-OPENROUTER_KEY = os.getenv("OPENROUTER_KEY")
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+
+client = genai.Client(api_key=GOOGLE_API_KEY)
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("👋 Merhaba! Ben Jarvis!")
@@ -12,28 +14,11 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_message = update.message.text
     try:
-        response = requests.post(
-            url="https://openrouter.ai/api/v1/chat/completions",
-            headers={
-                "Authorization": f"Bearer {OPENROUTER_KEY}",
-                "HTTP-Referer": "https://jarvis-bot.com",
-                "X-Title": "Jarvis Bot"
-            },
-            json={
-                "model": "mistral-7b-instruct:free",
-                "messages": [{"role": "user", "content": user_message}],
-                "max_tokens": 1024
-            }
+        response = client.models.generate_content(
+            model="gemini-2.0-flash",
+            contents=user_message
         )
-        
-        result = response.json()
-        print(f"API Response: {result}")
-        
-        if "choices" in result:
-            answer = result["choices"][0]["message"]["content"]
-            await update.message.reply_text(answer)
-        else:
-            await update.message.reply_text(f"❌ API Hatası: {result}")
+        await update.message.reply_text(response.text)
     except Exception as e:
         await update.message.reply_text(f"❌ Hata: {str(e)}")
 
