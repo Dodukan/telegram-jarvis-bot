@@ -7,7 +7,7 @@ TOKEN = os.getenv("TOKEN")
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 
 genai.configure(api_key=GOOGLE_API_KEY)
-model = genai.GenerativeModel('gemini-1.5-flash')  # BU SATIR DEĞİŞTİ!
+model = genai.GenerativeModel('gemini-1 beta')  # BU SATIR DEĞİŞTİ!
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("👋 Merhaba! Ben Jarvis!")
