@@ -14,15 +14,26 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         response = requests.post(
             url="https://openrouter.ai/api/v1/chat/completions",
-            headers={"Authorization": f"Bearer {OPENROUTER_KEY}"},
+            headers={
+                "Authorization": f"Bearer {OPENROUTER_KEY}",
+                "HTTP-Referer": "https://jarvis-bot.com",
+                "X-Title": "Jarvis Bot"
+            },
             json={
                 "model": "meta-llama/llama-3-8b-instruct:free",
-                "messages": [{"role": "user", "content": user_message}]
+                "messages": [{"role": "user", "content": user_message}],
+                "max_tokens": 1024
             }
         )
+        
         result = response.json()
-        answer = result["choices"][0]["message"]["content"]
-        await update.message.reply_text(answer)
+        print(f"API Response: {result}")  # Hata detayı görmek için
+        
+        if "choices" in result:
+            answer = result["choices"][0]["message"]["content"]
+            await update.message.reply_text(answer)
+        else:
+            await update.message.reply_text(f"❌ API Hatası: {result}")
     except Exception as e:
         await update.message.reply_text(f"❌ Hata: {str(e)}")
 
