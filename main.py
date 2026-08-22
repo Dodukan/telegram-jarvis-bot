@@ -4,9 +4,9 @@ import os
 import google.generativeai as genai
 
 TOKEN = os.getenv("TOKEN")
-GEMINI_KEY = os.getenv("GEMINI_KEY")
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 
-genai.configure(api_key=GEMINI_KEY)
+genai.configure(api_key=GOOGLE_API_KEY)
 model = genai.GenerativeModel('gemini-pro')
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
