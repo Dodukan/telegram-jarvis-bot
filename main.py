@@ -15,7 +15,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_message = update.message.text
     try:
         message = client.chat.completions.create(
-            model="llama-3.1-70b-versatile",
+           model="llama-3.1-8b-instant",
             messages=[{"role": "user", "content": user_message}],
             max_tokens=1024
         )
