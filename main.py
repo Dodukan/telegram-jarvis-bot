@@ -20,14 +20,14 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 "X-Title": "Jarvis Bot"
             },
             json={
-                "model": "meta-llama/llama-3-8b-instruct:free",
+                "model": "mistral-7b-instruct:free",
                 "messages": [{"role": "user", "content": user_message}],
                 "max_tokens": 1024
             }
         )
         
         result = response.json()
-        print(f"API Response: {result}")  # Hata detayı görmek için
+        print(f"API Response: {result}")
         
         if "choices" in result:
             answer = result["choices"][0]["message"]["content"]
