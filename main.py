@@ -1,12 +1,10 @@
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 import os
-from groq import Groq
+import requests
 
 TOKEN = os.getenv("TOKEN")
-GROQ_KEY = os.getenv("GROQ_KEY")
-
-client = Groq(api_key=GROQ_KEY)
+OPENROUTER_KEY = os.getenv("OPENROUTER_KEY")
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("👋 Merhaba! Ben Jarvis!")
@@ -14,12 +12,17 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_message = update.message.text
     try:
-        message = client.chat.completions.create(
-           model="llama-3.1-8b-instant",
-            messages=[{"role": "user", "content": user_message}],
-            max_tokens=1024
+        response = requests.post(
+            url="https://openrouter.ai/api/v1/chat/completions",
+            headers={"Authorization": f"Bearer {OPENROUTER_KEY}"},
+            json={
+                "model": "meta-llama/llama-3-8b-instruct:free",
+                "messages": [{"role": "user", "content": user_message}]
+            }
         )
-        await update.message.reply_text(message.choices[0].message.content)
+        result = response.json()
+        answer = result["choices"][0]["message"]["content"]
+        await update.message.reply_text(answer)
     except Exception as e:
         await update.message.reply_text(f"❌ Hata: {str(e)}")
 
