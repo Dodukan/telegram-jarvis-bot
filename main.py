@@ -1,23 +1,25 @@
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 import os
-import google.generativeai as genai
+from groq import Groq
 
 TOKEN = os.getenv("TOKEN")
-GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+GROQ_KEY = os.getenv("GROQ_KEY")
 
-genai.configure(api_key=GOOGLE_API_KEY)
-model = genai.GenerativeModel('gemini-1 beta')  # BU SATIR DEĞİŞTİ!
+client = Groq(api_key=GROQ_KEY)
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("👋 Merhaba! Ben Jarvis!")
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_message = update.message.text
-    
     try:
-        response = model.generate_content(user_message)
-        await update.message.reply_text(response.text)
+        message = client.chat.completions.create(
+            model="mixtral-8x7b-32768",
+            messages=[{"role": "user", "content": user_message}],
+            max_tokens=1024
+        )
+        await update.message.reply_text(message.choices[0].message.content)
     except Exception as e:
         await update.message.reply_text(f"❌ Hata: {str(e)}")
 
